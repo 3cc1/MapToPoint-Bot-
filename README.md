@@ -12,6 +12,8 @@ Interactive map that displays events near a location with:
 - JavaScript
 - HTML/CSS
 - Flask (optional backend)
+- Gunicorn
+-flask-cors
 
 ## Features
 - Location-based search

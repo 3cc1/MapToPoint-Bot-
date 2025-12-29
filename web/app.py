@@ -1,20 +1,23 @@
-from flask import Flask, render_template, jsonify 
+from flask import Flask, render_template, jsonify
+from flask_cors import CORS
 import sqlite3
-import os 
+import os
 
 app = Flask(__name__)
+CORS(app)
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'C:\MapToPoint\events.db')
+# Database path (works locally + on Render)
+DB_PATH = os.getenv("DB_PATH", "events.db")
 print("DB PATH:", DB_PATH)
 
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
-@app.route('/api/events')
+@app.route("/api/events")
 def events():
     conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -23,16 +26,16 @@ def events():
     """)
 
     rows = cursor.fetchall()
-    conn.close()        
+    conn.close()
 
     return jsonify([
         {
-            "lat": r[0],
-            "lng": r[1],
-            "description": r[2],
-            "category": r[3]
-        } for r in rows
+            "lat": row["latitude"],
+            "lng": row["longitude"],
+            "description": row["description"],
+            "category": row["category"]
+        } for row in rows
     ])
-if __name__ == '__main__':
-    app.run(debug=True)
 
+if __name__ == "__main__":
+    app.run(debug=True)
