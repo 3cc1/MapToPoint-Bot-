@@ -1,14 +1,9 @@
 from flask import Flask, render_template, jsonify
 from flask_cors import CORS
-import sqlite3
-import os
+from db import init_db, get_all_events
 
 app = Flask(__name__)
 CORS(app)
-
-# Database path (works locally + on Render)
-DB_PATH = os.getenv("DB_PATH", "events.db")
-print("DB PATH:", DB_PATH)
 
 @app.route("/")
 def index():
@@ -16,26 +11,16 @@ def index():
 
 @app.route("/api/events")
 def events():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT latitude, longitude, description, category
-        FROM events
-    """)
-
-    rows = cursor.fetchall()
-    conn.close()
-
+    rows = get_all_events()
     return jsonify([
         {
-            "lat": row["latitude"],
-            "lng": row["longitude"],
-            "description": row["description"],
-            "category": row["category"]
-        } for row in rows
+            "lat": r[0],
+            "lng": r[1],
+            "description": r[2],
+            "category": r[3]
+        } for r in rows
     ])
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    init_db()
+    app.run()
