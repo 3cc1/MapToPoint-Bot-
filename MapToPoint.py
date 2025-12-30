@@ -8,7 +8,6 @@ from db import get_all_events
 from db import get_events_page, get_events_count
 import math 
 import os 
-from typing import Final
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -157,7 +156,6 @@ async def handle_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_states.get(user_id) == NEARBY_WAITING_LOCATION:
         user_lat = location.latitude
         user_lng = location.longitude
-        user_lng = location.longitude 
         radius_km = 5 # configurable 
 
         events = get_all_events()
